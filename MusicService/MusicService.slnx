@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="compose.yaml" />
+  </Folder>
+  <Project Path="MusicService.API/MusicService.API.csproj" />
+  <Project Path="MusicService.Application/MusicService.Application.csproj" />
+  <Project Path="MusicService.Domain/MusicService.Domain.csproj" />
+  <Project Path="MusicService.Infrastructure\MusicService.Infrastructure.csproj" />
+</Solution>

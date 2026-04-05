@@ -1,0 +1,53 @@
+﻿services:
+  musicservice.api:
+    image: musicservice.api
+    build:
+      context: .
+      dockerfile: MusicService.API/Dockerfile
+    environment:
+      - ConnectionStrings__Postgres=Host=postgres;Port=5432;Database=music_db;Username=pauldor;Password=asdfgh67;KeepAlive=30;Pooling=true;
+      
+      - ConnectionStrings__Redis=redis:6379
+      - Redis__InstanceName="MusicService"
+      
+      - Music__StartPath=Music
+      
+      - Socket__Port=8080
+      
+      - Kafka__MusicCreated__BootstrapServers=kafka-server:9092
+      - Kafka__MusicCreated__Topic=music-created
+      
+      - Kafka__MusicDeleted__BootstrapServers=kafka-server:9092
+      - Kafka__MusicDeleted__Topic=music-deleted
+    networks:
+      - music-solution-network
+    volumes:
+      - music_data:/app/Music
+    depends_on:
+      postgres:
+        condition: service_healthy
+  
+  
+  postgres:
+    image: postgres:16.11
+    environment:
+      POSTGRES_DB: "music_db"
+      POSTGRES_USER: "pauldor"
+      POSTGRES_PASSWORD: "asdfgh67"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U pauldor -d music_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./Databases/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - music-solution-network
+
+networks:
+  music-solution-network:
+    external: true
+volumes:
+  postgres_data:
+  music_data:

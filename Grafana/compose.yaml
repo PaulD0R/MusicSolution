@@ -1,0 +1,34 @@
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: music-solution-prometheus
+    volumes:
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
+      - prometheus_music_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yaml'
+      - '--storage.tsdb.path=/prometheus'
+    ports:
+      - "9090:9090"
+    networks:
+      - music-solution-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: music-solution-grafana
+    volumes:
+      - grafana_music_data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      - music-solution-network
+
+networks:
+  music-solution-network:
+    external: true 
+
+volumes:
+  prometheus_music_data:
+  grafana_music_data:

@@ -1,0 +1,31 @@
+## --- IDE & Editor Specific ---
+# JetBrains Rider / IntelliJ
+.idea/
+*.iml
+*.iws
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## --- .NET Specific ---
+[Bb]in/
+[Oo]bj/
+[Pp]ackages/
+_UpgradeReport_Files/
+*.sublime-project
+*.sublime-workspace
+
+## --- Databases & Local Secrets ---
+*.db
+*.local.xml
+# Игнорируем файлы секретов, если используешь Secret Manager
+usersecrets.json
+
+## --- OS Specific ---
+Thumbs.db
+Desktop.ini
+.DS_Store
