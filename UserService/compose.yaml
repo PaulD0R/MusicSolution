@@ -5,9 +5,11 @@
       context: .
       dockerfile: UserService.API/Dockerfile
     environment:
-      - ConnectionStrings__Postgres=Host=postgres;Port=5432;Database=music_user;Username=pauldor;Password=asdfgh67;KeepAlive=30;Pooling=true;
+      - ConnectionStrings__Postgres=Host=user-postgres;Port=5432;Database=music_user;Username=pauldor;Password=asdfgh67;
       
       - ConnectionStrings__Redis=redis:6379,abortConnect=false
+          
+      - ConnectioStrings_YARP=yarp-music:8080
       
       - Kafka__PersonCreated__BootstrapServers=kafka-server:9092
       - Kafka__PersonCreated__Topic=person-created
@@ -30,6 +32,7 @@
 
   postgres:
     image: postgres:16.11
+    container_name: user-postgres
     environment:
       POSTGRES_DB: "music_user"
       POSTGRES_USER: "pauldor"

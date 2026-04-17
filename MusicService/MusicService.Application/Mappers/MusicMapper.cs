@@ -24,7 +24,7 @@ public static class MusicMapper
 
             public MusicCreateEvent ToMusicCreateEvent() => new()
             {
-                Id = musicData.Id,
+                MusicId = musicData.Id,
                 Name = musicData.Name
             };
         }
