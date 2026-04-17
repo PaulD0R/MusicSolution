@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
 using MusicService.Application.DTOs.Helpers;
 using MusicService.Application.DTOs.Music;
 using MusicService.Application.Interfaces.Caching;
@@ -7,7 +6,6 @@ using MusicService.Application.Interfaces.Messages;
 using MusicService.Application.Interfaces.Repositories;
 using MusicService.Application.Interfaces.Services;
 using MusicService.Application.Mappers;
-using MusicService.Application.Options;
 using MusicService.Domain.Events;
 using MusicService.Domain.Exceptions;
 using MusicService.Domain.Models;
@@ -15,11 +13,10 @@ using MusicService.Domain.Models;
 namespace MusicService.Application.Services;
 
 public class MusicService(
-    IOptions<MusicOptions> options,
     IMusicDataRepository musicDataRepository,
     IMusicFileService musicFileService,
     //IMessageProducer<MusicCreateEvent> musicCreateEventProducer,
-    //IMessageProducer<MusicDeleteEvent> musicDeleteEventProducer
+    IMessageProducer<MusicDeleteEvent> musicDeleteEventProducer,
     ICachingService cachingService)
     : IMusicService
 {
@@ -39,7 +36,7 @@ public class MusicService(
         var musicData = await musicDataRepository.GetByIdAsync(id);
         if (musicData == null) throw new NotFoundException("Music not found");
             
-        var stream = musicFileService.GetStreamByPath(Path.Combine(options.Value.StartPath, musicData.Path));
+        var stream = musicFileService.GetStreamByPath(musicData.Path);
         musicDto = musicData.ToMusicDto(stream);
         await cachingService.SetAsync(MusicCacheKey + id, musicDto, TimeSpan.FromDays(1));
 
@@ -51,28 +48,20 @@ public class MusicService(
         var musicId = Guid.NewGuid();
         var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
         var filePath = $"{musicId}{extension}";
-        var fileFullPath = Path.Combine(options.Value.StartPath, $"{musicId}{extension}");
         
-        try
-        {
-            await musicFileService.AddAsync(file, fileFullPath);
-        }
-        catch (Exception ex)
-        {
-            throw new InternalServerErrorException(ex.Message);
-        }
+        await musicFileService.AddAsync(file, filePath);
         
         var music = await musicDataRepository.AddAsync(new MusicData
         {
             Id = musicId,  
-            Bitrate = musicFileService.GetBitrateByPath(fileFullPath),
+            Bitrate = musicFileService.GetBitrateByPath(filePath),
             Name = name,
             Path = filePath
         }); 
         
         if (music == null)
         {
-            musicFileService.DeleteAsync(fileFullPath);
+            musicFileService.Delete(filePath);
             throw new InternalServerErrorException("Failed");
         }
 
@@ -91,7 +80,7 @@ public class MusicService(
         
         try
         {
-            musicFileService.DeleteAsync(Path.Combine(options.Value.StartPath, musicData.Path));
+            musicFileService.Delete(musicData.Path);
         }
         catch (Exception ex)
         {
@@ -99,6 +88,6 @@ public class MusicService(
             throw new InternalServerErrorException(ex.Message);
         }
 
-        //await musicDeleteEventProducer.ProduceAsync(new MusicDeleteEvent { Id = id });
+        await musicDeleteEventProducer.ProduceAsync(new MusicDeleteEvent { MusicId = id });
     }
 }

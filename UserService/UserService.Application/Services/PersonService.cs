@@ -12,8 +12,8 @@ namespace UserService.Application.Services;
 
 public class PersonService(
     IPersonRepository personRepository,
-    //IMessageProducer<PersonDeleteEvent>  personDeleteProducer,
-    //IMessageProducer<PersonUpdateEvent>  personUpdateProducer,
+    IMessageProducer<PersonDeleteEvent>  personDeleteProducer,
+    IMessageProducer<PersonUpdateEvent>  personUpdateProducer,
     IHashCachingService cachingService,
     ILogger<PersonService> logger)
     : IPersonService
@@ -59,7 +59,7 @@ public class PersonService(
         if (string.IsNullOrEmpty(person.UserName)) return result;
         
         await cachingService.SetFieldAsync(KeyStart + id, nameof(person.UserName), person.UserName);
-        //await personUpdateProducer.ProduceAsync(person.ToPersonUpdateEvent());
+        await personUpdateProducer.ProduceAsync(person.ToPersonUpdateEvent());
         logger.LogInformation("Name was changed successfully");
 
         return result;
@@ -71,7 +71,7 @@ public class PersonService(
             throw new NotFoundException($"Person {id} not found");
 
         await cachingService.RemoveAsync(KeyStart + id);
-        //await personDeleteProducer.ProduceAsync(new PersonDeleteEvent { PersonId = id });
+        await personDeleteProducer.ProduceAsync(new PersonDeleteEvent { PersonId = id });
         logger.LogInformation("Person {Id} was deleted successfully", id);
         
         return result;

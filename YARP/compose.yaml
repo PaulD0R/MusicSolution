@@ -7,6 +7,7 @@
     environment:
       - ReverseProxy__Clusters__cluster-user__Destinations__dest1__Address=http://userservice-userservice.api-1:8080
       - ReverseProxy__Clusters__cluster-music__Destinations__dest1__Address=http://musicservice-musicservice.api-1:8080
+      - ReverseProxy__Clusters__cluster-comment__Destinations__dest1__Address=http://commentservice-commentservice.api-1:8080
     networks:
       - music-solution-network
     build:

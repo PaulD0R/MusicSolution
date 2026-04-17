@@ -2,15 +2,17 @@
   musicservice.api:
     image: musicservice.api
     build:
-      context: .
+      context: .    
       dockerfile: MusicService.API/Dockerfile
     environment:
-      - ConnectionStrings__Postgres=Host=postgres;Port=5432;Database=music_db;Username=pauldor;Password=asdfgh67;KeepAlive=30;Pooling=true;
+      - ConnectionStrings__Postgres=Host=music-postgres;Port=5432;Database=music_db;Username=pauldor;Password=asdfgh67;
       
       - ConnectionStrings__Redis=redis:6379
       - Redis__InstanceName="MusicService"
-      
-      - Music__StartPath=Music
+
+      - ConnectioStrings_YARP=yarp-music:8080
+        
+      - Music__StartPath=/app/Musics
       
       - Socket__Port=8080
       
@@ -19,10 +21,14 @@
       
       - Kafka__MusicDeleted__BootstrapServers=kafka-server:9092
       - Kafka__MusicDeleted__Topic=music-deleted
+        
+      - Jwt__Issuer:Issuer
+      - Jwt__Audience:Audience
+      - Jwt__Secret:8Yd1CYLqzRzPF7Ntzdrp72KGb2aBG/4kGxYZE6ImuOo=
     networks:
       - music-solution-network
     volumes:
-      - music_data:/app/Music
+      - music_data:/app/Musics
     depends_on:
       postgres:
         condition: service_healthy
@@ -30,6 +36,7 @@
   
   postgres:
     image: postgres:16.11
+    container_name: music-postgres
     environment:
       POSTGRES_DB: "music_db"
       POSTGRES_USER: "pauldor"

@@ -43,7 +43,7 @@ namespace MusicService.Infrastructure.Migrations
                         name: "FK_Likes_MusicData_MusicDataId",
                         column: x => x.MusicDataId,
                         principalTable: "MusicData",
-                        principalColumn: "Id");
+                        principalColumn: "MusicId");
                 });
 
             migrationBuilder.CreateIndex(

@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Confluent.Kafka;
 
-namespace MusicService.Infrastructure.Kafka;
+namespace UserService.Infrastructure.Kafka;
 
 public class KafkaJsonSerializer<TMessage> : ISerializer<TMessage>
 {

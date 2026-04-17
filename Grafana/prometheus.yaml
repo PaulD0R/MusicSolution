@@ -2,8 +2,9 @@ global:
   scrape_interval: 5s
 
 scrape_configs:
-  - job_name: 'music-service'
+  - job_name: 'music-solution'
     static_configs:
       - targets: 
         - 'musicservice-musicservice.api-1:8080'
         - 'userservice-userservice.api-1:8080'
+        - 'commentservice-commentservice.api-1:8080'

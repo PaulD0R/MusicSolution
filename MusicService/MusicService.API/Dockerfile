@@ -25,8 +25,7 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 
 USER root
-RUN mkdir -p /app/Music && chown -R app:app /app/Music
-
+RUN mkdir -p /app/Musics && chown -R app:app /app/Musics
 USER app
 
 ENTRYPOINT ["dotnet", "MusicService.API.dll"]
