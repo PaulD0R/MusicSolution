@@ -1,6 +1,6 @@
 namespace MusicService.Application.Options;
 
-public class MusicOptions
+public class MusicFileOptions
 {
     public string StartPath { get; set; } = null!;
 }
