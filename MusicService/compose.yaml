@@ -10,7 +10,7 @@
       - ConnectionStrings__Redis=redis:6379
       - Redis__InstanceName="MusicService"
 
-      - ConnectioStrings_YARP=yarp-music:8080
+      - ConnectionStrings_YARP=yarp-music:8080
         
       - Music__StartPath=/app/Musics
       

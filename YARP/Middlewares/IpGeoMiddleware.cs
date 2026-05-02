@@ -8,20 +8,42 @@ public class IpGeoMiddleware(RequestDelegate next, IGeoIP2DatabaseReader reader)
     
     public async Task InvokeAsync(HttpContext context)
     {
-        var ip = context.Connection.RemoteIpAddress?.ToString();
-
-        if (!string.IsNullOrEmpty(ip))
+        // 1. Пытаемся получить IP. Если работаем за прокси, 
+        // RemoteIpAddress будет корректным только при настроенном UseForwardedHeaders
+        var remoteIp = context.Connection.RemoteIpAddress;
+    
+        if (remoteIp != null)
         {
-            var country = reader.Country(ip).Country.IsoCode;
-
-            if (!_allowedCountries.Contains(country))
+            // Пропускаем проверку для локальных IP (опционально)
+            if (IPAddress.IsLoopback(remoteIp)) 
             {
-                context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                await context.Response.WriteAsync($"1984");
+                await next(context);
                 return;
             }
+
+            if (reader.TryCountry(remoteIp, out var response))
+            {
+                var country = response.Country.IsoCode;
+                logger.LogInformation("IP {ip} identified as {country}", remoteIp, country);
+
+                // 2. Логика блокировки
+                if (!_allowedCountries.Contains(country))
+                {
+                    logger.LogWarning("Access denied for country: {country}", country);
+                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                    await context.Response.WriteAsync("1984");
+                    return;
+                }
+            }
+            else
+            {
+                // 3. Что делать, если IP не найден в базе? 
+                // Сейчас код просто пропускает (country == null). 
+                // Если нужна жесткая политика — блокируй и здесь.
+                logger.LogDebug("IP {ip} not found in GeoDB", remoteIp);
+            }
         }
-        
+
         await next(context);
     }
 }

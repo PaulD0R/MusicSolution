@@ -1,5 +1,5 @@
 services:
-  kafka-service: 
+  kafka-service:
     image: apache/kafka:latest
     container_name: kafka-server
     environment:
@@ -14,6 +14,29 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    networks:
+      - music-solution-network
+
+  kafka-init:
+    image: apache/kafka:latest
+    container_name: kafka-init
+    depends_on:
+      kafka-service:
+        condition: service_healthy
+    entrypoint: [ "/bin/sh", "-c" ]
+    command: |
+      "
+      /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka-server:9092 --create --if-not-exists --topic music-created --partitions 1 --replication-factor 1
+      /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka-server:9092 --create --if-not-exists --topic music-deleted --partitions 1 --replication-factor 1
+      /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka-server:9092 --create --if-not-exists --topic person-created --partitions 1 --replication-factor 1
+      /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka-server:9092 --create --if-not-exists --topic person-deleted --partitions 1 --replication-factor 1
+      /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka-server:9092 --create --if-not-exists --topic person-updated --partitions 1 --replication-factor 1
+      "
     networks:
       - music-solution-network
 

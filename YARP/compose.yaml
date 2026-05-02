@@ -1,17 +1,26 @@
 ﻿services:
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-music
+    ports:
+      - "5197:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - yarp
+    networks:
+      - music-solution-network
+
   yarp:
     image: yarp
     container_name: yarp-music  
-    ports:
-      - 5197:8080
     environment:
       - ReverseProxy__Clusters__cluster-user__Destinations__dest1__Address=http://userservice-userservice.api-1:8080
       - ReverseProxy__Clusters__cluster-music__Destinations__dest1__Address=http://musicservice-musicservice.api-1:8080
       - ReverseProxy__Clusters__cluster-comment__Destinations__dest1__Address=http://commentservice-commentservice.api-1:8080
-        
       - GeoIP__Path=Databases/GeoLite2-Country.mmdb
     volumes:
-      - ./yarp-proxy/GeoLite2-Country.mmdb:/app/data/GeoLite2-Country.mmdb:ro
+      - ./Databases/GeoLite2-Country.mmdb:/app/Databases/GeoLite2-Country.mmdb:ro
     networks:
       - music-solution-network
     build:
@@ -21,4 +30,3 @@
 networks:
   music-solution-network:
     external: true
-    
