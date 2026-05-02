@@ -8,12 +8,16 @@
       - ReverseProxy__Clusters__cluster-user__Destinations__dest1__Address=http://userservice-userservice.api-1:8080
       - ReverseProxy__Clusters__cluster-music__Destinations__dest1__Address=http://musicservice-musicservice.api-1:8080
       - ReverseProxy__Clusters__cluster-comment__Destinations__dest1__Address=http://commentservice-commentservice.api-1:8080
+        
+      - GeoIP__Path=Databases/GeoLite2-Country.mmdb
+    volumes:
+      - ./yarp-proxy/GeoLite2-Country.mmdb:/app/data/GeoLite2-Country.mmdb:ro
     networks:
       - music-solution-network
     build:
       context: .
       dockerfile: Dockerfile
-
+  
 networks:
   music-solution-network:
     external: true
