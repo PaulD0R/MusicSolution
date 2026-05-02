@@ -22,19 +22,6 @@ docker compose -f $REDIS_FILE -f $GRAFANA_FILE -f $KAFKA_FILE -f $MUSIC_SERVICE_
 docker compose -f $REDIS_FILE up -d
 docker compose -f $GRAFANA_FILE up -d
 docker compose -f $KAFKA_FILE up -d
-
-until docker exec $KAFKA_CONTAINER_NAME kafka-topics.sh --bootstrap-server $BOOTSTRAP_SERVER --list &> /dev/null; do
-  sleep 2
-done
-
-for TOPIC in "${TOPICS[@]}"; do
-  docker exec $KAFKA_CONTAINER_NAME \
-    kafka-topics.sh --create \
-    --if-not-exists \
-    --bootstrap-server $BOOTSTRAP_SERVER \
-    --topic $TOPIC 
-done
-
 docker compose -f $MUSIC_SERVICE_FILE up -d
 docker compose -f $USER_SERVICE_FILE up -d
 docker compose -f $COMMENT_SERVICE_FILE up -d
