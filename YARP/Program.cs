@@ -13,10 +13,14 @@ builder.WebHost.ConfigureKestrel(options => options.Limits.MaxRequestBodySize = 
 builder.Services.Configure<FormOptions>(options => options.MultipartBodyLengthLimit = 100 * 1024 * 1024);
 
 var app = builder.Build();
-app.UseForwardedHeaders(new ForwardedHeadersOptions
+var headerOptions = new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-});
+};
+headerOptions.KnownNetworks.Clear();
+headerOptions.KnownProxies.Clear();
+
+app.UseForwardedHeaders();
 app.Use(async (context, next) =>
 {
     var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
