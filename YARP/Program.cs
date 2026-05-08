@@ -20,7 +20,7 @@ var headerOptions = new ForwardedHeadersOptions
 headerOptions.KnownNetworks.Clear();
 headerOptions.KnownProxies.Clear();
 
-app.UseForwardedHeaders();
+app.UseForwardedHeaders(headerOptions);
 app.Use(async (context, next) =>
 {
     var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();

@@ -28,6 +28,7 @@ USER root
 RUN apt-get update && apt-get install -y ffmpeg && rm -rf /var/lib/apt/lists/*
 RUN mkdir -p /app/Videos && chown -R app:app /app/Videos
 RUN mkdir -p /app/Pictures && chown -R app:app /app/Pictures
+RUN mkdir -p /app/Logs && chown -R app:app /app/Logs
 USER app
 
 ENTRYPOINT ["dotnet", "CommentService.API.dll"]

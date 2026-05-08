@@ -29,3 +29,5 @@ usersecrets.json
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+*/log-*.txt
