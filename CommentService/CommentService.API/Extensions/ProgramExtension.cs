@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using OpenTelemetry.Metrics;
+using Serilog;
 using Xabe.FFmpeg;
 
 namespace CommentService.API.Extensions;
@@ -45,6 +46,15 @@ public static class ProgramExtension
             return services;
         }
 
+        public IServiceCollection AddLoggers(IConfigurationSection configuration)
+        {
+            Log.Logger = new LoggerConfiguration().MinimumLevel.Information()
+                .WriteTo.File(configuration["Path"]!, rollingInterval: RollingInterval.Hour)
+                .CreateLogger();
+                
+            return services;
+        }
+        
         public IServiceCollection AddAppTelemetry()
         {
             services.AddOpenTelemetry()

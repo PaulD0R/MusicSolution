@@ -16,7 +16,7 @@ public class MusicService(
     IMusicDataRepository musicDataRepository,
     IMusicFileService musicFileService,
     //IMessageProducer<MusicCreateEvent> musicCreateEventProducer,
-    IMessageProducer<MusicDeleteEvent> musicDeleteEventProducer,
+    //IMessageProducer<MusicDeleteEvent> musicDeleteEventProducer,
     ICachingService cachingService)
     : IMusicService
 {
@@ -88,6 +88,6 @@ public class MusicService(
             throw new InternalServerErrorException(ex.Message);
         }
 
-        await musicDeleteEventProducer.ProduceAsync(new MusicDeleteEvent { MusicId = id });
+        //await musicDeleteEventProducer.ProduceAsync(new MusicDeleteEvent { MusicId = id });
     }
 }

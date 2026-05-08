@@ -15,8 +15,8 @@
       - Comment__VideoStartPath=/app/Videos
       - Comment__PictureStartPath=/app/Pictures
 
-      - Socket__Port=8080
-
+      - Logs__Path=/app/Logs/log-.txt
+       
       - Kafka__PersonCreated__BootstrapServers=kafka-server:9092
       - Kafka__PersonCreated__Topic=person-created
       - Kafka__PersonCreated__GroupId=comment-service-create-person
@@ -30,14 +30,15 @@
       - Kafka__MusicDeleted__GroupId=comment-service-delete-music
         
       - FFmpeg__Path=/usr/bin
-      - Jwt__Issuer:Issuer
-      - Jwt__Audience:Audience
-      - Jwt__Secret:8Yd1CYLqzRzPF7Ntzdrp72KGb2aBG/4kGxYZE6ImuOo=
+      - Jwt__Issuer=Issuer
+      - Jwt__Audience=Audience
+      - Jwt__Secret=8Yd1CYLqzRzPF7Ntzdrp72KGb2aBG/4kGxYZE6ImuOo=
     networks:
       - music-solution-network
     volumes:
         - video_data:/app/Videos
         - picture_data:/app/Pictures
+        - logs_data:/app/Logs/log-.txt
     depends_on:
       postgres:
         condition: service_healthy
@@ -68,3 +69,4 @@ volumes:
   postgres_data:
   video_data:
   picture_data:
+  logs_data:

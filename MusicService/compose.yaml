@@ -13,6 +13,8 @@
       - ConnectionStrings_YARP=yarp-music:8080
         
       - Music__StartPath=/app/Musics
+        
+      - Logs__Path=/app/Logs/log-.txt
       
       - Socket__Port=8080
       
@@ -22,13 +24,14 @@
       - Kafka__MusicDeleted__BootstrapServers=kafka-server:9092
       - Kafka__MusicDeleted__Topic=music-deleted
         
-      - Jwt__Issuer:Issuer
-      - Jwt__Audience:Audience
-      - Jwt__Secret:8Yd1CYLqzRzPF7Ntzdrp72KGb2aBG/4kGxYZE6ImuOo=
+      - Jwt__Issuer=Issuer
+      - Jwt__Audience=Audience
+      - Jwt__Secret=8Yd1CYLqzRzPF7Ntzdrp72KGb2aBG/4kGxYZE6ImuOo=
     networks:
       - music-solution-network
     volumes:
       - music_data:/app/Musics
+      - logs_data:/app/Logs/log-.txt
     depends_on:
       postgres:
         condition: service_healthy
@@ -58,3 +61,4 @@ networks:
 volumes:
   postgres_data:
   music_data:
+  logs_data:

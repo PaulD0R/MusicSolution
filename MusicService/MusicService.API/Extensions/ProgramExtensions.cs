@@ -20,6 +20,7 @@ using MusicService.Infrastructure.Kafka;
 using MusicService.Infrastructure.Options;
 using MusicService.Infrastructure.Repositories;
 using OpenTelemetry.Metrics;
+using Serilog;
 
 namespace MusicService.API.Extensions;
 
@@ -48,6 +49,15 @@ public static class ProgramExtensions
                         .AddAspNetCoreInstrumentation()
                         .AddPrometheusExporter());
 
+                return services;
+            }
+
+            public IServiceCollection AddLoggers(IConfigurationSection configuration)
+            {
+                Log.Logger = new LoggerConfiguration().MinimumLevel.Information()
+                    .WriteTo.File(configuration["Path"]!, rollingInterval: RollingInterval.Hour)
+                    .CreateLogger();
+                
                 return services;
             }
             
@@ -101,8 +111,8 @@ public static class ProgramExtensions
                 services.AddScoped<IMusicFileService, MusicFileService>();
                 services.AddScoped<ILikeService, LikeService>();
 
-                services.AddProducer<MusicCreateEvent>(configuration.GetSection("Kafka:MusicCreated"));
-                services.AddProducer<MusicDeleteEvent>(configuration.GetSection("Kafka:MusicDeleted"));
+                // services.AddProducer<MusicCreateEvent>(configuration.GetSection("Kafka:MusicCreated"));
+                // services.AddProducer<MusicDeleteEvent>(configuration.GetSection("Kafka:MusicDeleted"));
                 
                 services.AddHostedService<MusicSocketBackgroundService>();
 

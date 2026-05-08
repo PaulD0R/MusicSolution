@@ -10,6 +10,8 @@
       - ConnectionStrings__Redis=redis:6379,abortConnect=false
           
       - ConnectioStrings_YARP=yarp-music:8080
+        
+      - Logs__Path=/app/Logs/log-.txt
       
       - Kafka__PersonCreated__BootstrapServers=kafka-server:9092
       - Kafka__PersonCreated__Topic=person-created
@@ -20,11 +22,13 @@
       - Kafka__PersonUpdated__BootstrapServers=kafka-server:9092
       - Kafka__PersonUpdated__Topic=person-updated
         
-      - Jwt__Issuer:Issuer
-      - Jwt__Audience:Audience
-      - Jwt__Secret:8Yd1CYLqzRzPF7Ntzdrp72KGb2aBG/4kGxYZE6ImuOo=
+      - Jwt__Issuer=Issuer
+      - Jwt__Audience=Audience
+      - Jwt__Secret=8Yd1CYLqzRzPF7Ntzdrp72KGb2aBG/4kGxYZE6ImuOo=
     networks:
       - music-solution-network
+    volumes:
+      - logs_data:/app/Logs/log-.txt
     depends_on:
       postgres:
         condition: service_healthy
@@ -50,6 +54,7 @@
       
 volumes:
   postgres_data:
+  logs_data:
     
 networks:
   music-solution-network:
