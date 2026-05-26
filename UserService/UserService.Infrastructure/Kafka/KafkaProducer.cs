@@ -24,18 +24,27 @@ public class KafkaProducer<TMessage> : IMessageProducer<TMessage>
             BootstrapServers = options.BootstrapServers
         };
         
-        _producer = new ProducerBuilder<string, TMessage>(config).Build();
+        _producer = new ProducerBuilder<string, TMessage>(config)
+            .SetValueSerializer(new KafkaJsonSerializer<TMessage>()).Build();
 
         _topic = options.Topic;
     }
     
     public async Task ProduceAsync(TMessage message, CancellationToken cancellationToken)
     {
-        await _producer.ProduceAsync(_topic, new Message<string, TMessage>
+        try 
         {
-            Value = message
-        },  cancellationToken);
-        _logger.LogInformation("Message: {Message} in topic: {Topic}", message, _topic);
+            var result = await _producer.ProduceAsync(_topic, new Message<string, TMessage>
+            {
+                Value = message
+            }, cancellationToken);
+
+            _logger.LogInformation("Delivered to: {TopicPartitionOffset}", result.TopicPartitionOffset);
+        }
+        catch (ProduceException<string, TMessage> e)
+        {
+            _logger.LogError($"Delivery failed: {e.Error.Reason}");
+        }
     }
 
     public void Dispose()

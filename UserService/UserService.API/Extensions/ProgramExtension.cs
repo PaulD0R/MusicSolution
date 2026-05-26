@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using OpenTelemetry.Metrics;
+using Serilog;
 using StackExchange.Redis;
 using UserService.API.Exceptions;
 using UserService.Application.Interfaces.Cachings;
@@ -67,6 +68,15 @@ public static class ProgramExtension
             return services;
         }
 
+        public IServiceCollection AddLoggers(IConfigurationSection configuration)
+        {
+            Log.Logger = new LoggerConfiguration().MinimumLevel.Information()
+                .WriteTo.File(configuration["Path"]!, rollingInterval: RollingInterval.Hour)
+                .CreateLogger();
+                
+            return services;
+        }
+        
         public IServiceCollection AddSecurityConfiguration(IConfigurationSection jwtConfig)
         {
             services.AddIdentity<Person, IdentityRole>(options =>

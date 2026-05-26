@@ -16,6 +16,7 @@ public class LikeController(
     [HttpPost("{musicId:guid}")]
     public async Task<IActionResult> Add([FromRoute] Guid musicId)
     {
+        logger.LogInformation("GET likes/{MusicID}", musicId);
         var userId = User.GetUserId();
         if (userId == null)
             return Unauthorized();
@@ -38,6 +39,7 @@ public class LikeController(
     [HttpGet("person")]
     public async Task<IActionResult> GetPerson()
     {
+        logger.LogInformation("GET likes/person");
         var userId = User.GetUserId();
         if (userId == null)
             return Unauthorized();

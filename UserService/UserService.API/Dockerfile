@@ -23,4 +23,9 @@ RUN dotnet publish "./UserService.API.csproj" -c $BUILD_CONFIGURATION -o /app/pu
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+USER root
+RUN mkdir -p /app/Logs && chown -R app:app /app/Logs
+USER app
+
 ENTRYPOINT ["dotnet", "UserService.API.dll"]
