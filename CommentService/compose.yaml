@@ -3,56 +3,47 @@
     image: commentservice.api
     build:
       context: .
-      dockerfile: CommentService.API/Dockerfile 
+      dockerfile: CommentService.API/Dockerfile
     environment:
-      - ConnectionStrings__Postgres=Host=comment-postgres;Port=5432;Database=music_comment;Username=pauldor;Password=asdfgh67;KeepAlive=30;Pooling=true;
-
-      - ConnectionStrings__Redis=redis:6379
-      - Redis__InstanceName=CommentService
-        
-      - ConnectioStrings_YARP=yarp-music:8080
-
-      - Comment__VideoStartPath=/app/Videos
-      - Comment__PictureStartPath=/app/Pictures
-
-      - Logs__Path=/app/Logs/log-.txt
-       
-      - Kafka__PersonCreated__BootstrapServers=kafka-server:9092
-      - Kafka__PersonCreated__Topic=person-created
-      - Kafka__PersonCreated__GroupId=comment-service-create-person
-        
-      - Kafka__PersonDeleted__BootstrapServers=kafka-server:9092
-      - Kafka__PersonDeleted__Topic=person-deleted
-      - Kafka__PersonDeleted__GroupId=comment-service-delete-person
-
-      - Kafka__MusicDeleted__BootstrapServers=kafka-server:9092
-      - Kafka__MusicDeleted__Topic=music-deleted
-      - Kafka__MusicDeleted__GroupId=comment-service-delete-music
-        
-      - FFmpeg__Path=/usr/bin
-      - Jwt__Issuer=Issuer
-      - Jwt__Audience=Audience
-      - Jwt__Secret=8Yd1CYLqzRzPF7Ntzdrp72KGb2aBG/4kGxYZE6ImuOo=
+      - ConnectionStrings__Postgres=Host=${POSTGRES_HOST};Port=${POSTGRES_PORT};Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};KeepAlive=30;Pooling=true;
+      - ConnectionStrings__Redis=${REDIS_HOST}:${REDIS_PORT}
+      - ConnectionStrings__YARP=${YARP_HOST}:${YARP_PORT}
+      - Redis__InstanceName=${REDIS_INSTANCE_NAME}
+      - Comment__VideoStartPath=${COMMENT_VIDEO_START_PATH}
+      - Comment__PictureStartPath=${COMMENT_PICTURE_START_PATH}
+      - Logs__Path=${LOGS_PATH}
+      - Kafka__PersonCreated__BootstrapServers=${KAFKA_BOOTSTRAP_SERVERS}
+      - Kafka__PersonCreated__Topic=${KAFKA_TOPIC_PERSON_CREATED}
+      - Kafka__PersonCreated__GroupId=${KAFKA_GROUP_PERSON_CREATED}
+      - Kafka__PersonDeleted__BootstrapServers=${KAFKA_BOOTSTRAP_SERVERS}
+      - Kafka__PersonDeleted__Topic=${KAFKA_TOPIC_PERSON_DELETED}
+      - Kafka__PersonDeleted__GroupId=${KAFKA_GROUP_PERSON_DELETED}
+      - Kafka__MusicDeleted__BootstrapServers=${KAFKA_BOOTSTRAP_SERVERS}
+      - Kafka__MusicDeleted__Topic=${KAFKA_TOPIC_MUSIC_DELETED}
+      - Kafka__MusicDeleted__GroupId=${KAFKA_GROUP_MUSIC_DELETED}
+      - FFmpeg__Path=${FFMPEG_PATH}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
+      - Jwt__PublicKey=${JWT_PUBLIC_KEY}
     networks:
       - music-solution-network
     volumes:
-        - video_data:/app/Videos
-        - picture_data:/app/Pictures
-        - logs_data:/app/Logs/log-.txt
+      - video_data:${COMMENT_VIDEO_START_PATH}
+      - picture_data:${COMMENT_PICTURE_START_PATH}
+      - logs_data:${LOGS_PATH}
     depends_on:
       postgres:
         condition: service_healthy
 
-
   postgres:
     image: postgres:16.11
-    container_name: comment-postgres
+    container_name: ${POSTGRES_HOST}
     environment:
-      POSTGRES_DB: "music_comment"
-      POSTGRES_USER: "pauldor"  
-      POSTGRES_PASSWORD: "asdfgh67"
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U pauldor -d music_comment" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -65,6 +56,7 @@
 networks:
   music-solution-network:
     external: true
+
 volumes:
   postgres_data:
   video_data:

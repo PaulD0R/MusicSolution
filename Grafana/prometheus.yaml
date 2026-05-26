@@ -8,3 +8,4 @@ scrape_configs:
         - 'musicservice-musicservice.api-1:8080'
         - 'userservice-userservice.api-1:8080'
         - 'commentservice-commentservice.api-1:8080'
+        - 'roomservice-roomservice.api-1:8080'

@@ -2,50 +2,41 @@
   musicservice.api:
     image: musicservice.api
     build:
-      context: .    
+      context: .
       dockerfile: MusicService.API/Dockerfile
     environment:
-      - ConnectionStrings__Postgres=Host=music-postgres;Port=5432;Database=music_db;Username=pauldor;Password=asdfgh67;
-      
-      - ConnectionStrings__Redis=redis:6379
-      - Redis__InstanceName="MusicService"
-
-      - ConnectionStrings_YARP=yarp-music:8080
-        
-      - Music__StartPath=/app/Musics
-        
-      - Logs__Path=/app/Logs/log-.txt
-      
-      - Socket__Port=8080
-      
-      - Kafka__MusicCreated__BootstrapServers=kafka-server:9092
-      - Kafka__MusicCreated__Topic=music-created
-      
-      - Kafka__MusicDeleted__BootstrapServers=kafka-server:9092
-      - Kafka__MusicDeleted__Topic=music-deleted
-        
-      - Jwt__Issuer=Issuer
-      - Jwt__Audience=Audience
-      - Jwt__Secret=8Yd1CYLqzRzPF7Ntzdrp72KGb2aBG/4kGxYZE6ImuOo=
+      - ConnectionStrings__Postgres=Host=${POSTGRES_HOST};Port=${POSTGRES_PORT};Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
+      - ConnectionStrings__Redis=${REDIS_HOST}:${REDIS_PORT}
+      - ConnectionStrings__YARP=${YARP_HOST}:${YARP_PORT}
+      - Redis__InstanceName=${REDIS_INSTANCE_NAME}
+      - Music__StartPath=${MUSIC_START_PATH}
+      - Logs__Path=${LOGS_PATH}
+      - Socket__Port=${SOCKET_PORT}
+      - Kafka__MusicCreated__BootstrapServers=${KAFKA_BOOTSTRAP_SERVERS}
+      - Kafka__MusicCreated__Topic=${KAFKA_TOPIC_CREATED}
+      - Kafka__MusicDeleted__BootstrapServers=${KAFKA_BOOTSTRAP_SERVERS}
+      - Kafka__MusicDeleted__Topic=${KAFKA_TOPIC_DELETED}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
+      - Jwt__PublicKey=${JWT_PUBLIC_KEY}
     networks:
       - music-solution-network
     volumes:
-      - music_data:/app/Musics
-      - logs_data:/app/Logs/log-.txt
+      - music_data:${MUSIC_START_PATH}
+      - logs_data:${LOGS_PATH}
     depends_on:
       postgres:
         condition: service_healthy
   
-  
   postgres:
     image: postgres:16.11
-    container_name: music-postgres
+    container_name: ${POSTGRES_HOST}
     environment:
-      POSTGRES_DB: "music_db"
-      POSTGRES_USER: "pauldor"
-      POSTGRES_PASSWORD: "asdfgh67"
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U pauldor -d music_db" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -58,6 +49,7 @@
 networks:
   music-solution-network:
     external: true
+
 volumes:
   postgres_data:
   music_data:

@@ -5,44 +5,37 @@
       context: .
       dockerfile: UserService.API/Dockerfile
     environment:
-      - ConnectionStrings__Postgres=Host=user-postgres;Port=5432;Database=music_user;Username=pauldor;Password=asdfgh67;
-      
-      - ConnectionStrings__Redis=redis:6379,abortConnect=false
-          
-      - ConnectioStrings_YARP=yarp-music:8080
-        
-      - Logs__Path=/app/Logs/log-.txt
-      
-      - Kafka__PersonCreated__BootstrapServers=kafka-server:9092
-      - Kafka__PersonCreated__Topic=person-created
-
-      - Kafka__PersonDeleted__BootstrapServers=kafka-server:9092
-      - Kafka__PersonDeleted__Topic=person-deleted
-
-      - Kafka__PersonUpdated__BootstrapServers=kafka-server:9092
-      - Kafka__PersonUpdated__Topic=person-updated
-        
-      - Jwt__Issuer=Issuer
-      - Jwt__Audience=Audience
-      - Jwt__Secret=8Yd1CYLqzRzPF7Ntzdrp72KGb2aBG/4kGxYZE6ImuOo=
+      - ConnectionStrings__Postgres=Host=${POSTGRES_HOST};Port=${POSTGRES_PORT};Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
+      - ConnectionStrings__Redis=${REDIS_HOST}:${REDIS_PORT},abortConnect=false
+      - ConnectionStrings__YARP=${YARP_HOST}:${YARP_PORT}
+      - Logs__Path=${LOGS_PATH}
+      - Kafka__PersonCreated__BootstrapServers=${KAFKA_BOOTSTRAP_SERVERS}
+      - Kafka__PersonCreated__Topic=${KAFKA_TOPIC_PERSON_CREATED}
+      - Kafka__PersonDeleted__BootstrapServers=${KAFKA_BOOTSTRAP_SERVERS}
+      - Kafka__PersonDeleted__Topic=${KAFKA_TOPIC_PERSON_DELETED}
+      - Kafka__PersonUpdated__BootstrapServers=${KAFKA_BOOTSTRAP_SERVERS}
+      - Kafka__PersonUpdated__Topic=${KAFKA_TOPIC_PERSON_UPDATED}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
+      - Jwt__PrivateKey=${JWT_PRIVATE_KEY}
+      - Jwt__PublicKey=${JWT_PUBLIC_KEY}
     networks:
       - music-solution-network
     volumes:
-      - logs_data:/app/Logs/log-.txt
+      - logs_data:${LOGS_PATH}
     depends_on:
       postgres:
         condition: service_healthy
-          
 
   postgres:
     image: postgres:16.11
-    container_name: user-postgres
+    container_name: ${POSTGRES_HOST}
     environment:
-      POSTGRES_DB: "music_user"
-      POSTGRES_USER: "pauldor"    
-      POSTGRES_PASSWORD: "asdfgh67"
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U pauldor -d music_user" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -51,11 +44,11 @@
       - ./Databases/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - music-solution-network
-      
+
 volumes:
   postgres_data:
   logs_data:
-    
+
 networks:
   music-solution-network:
     external: true

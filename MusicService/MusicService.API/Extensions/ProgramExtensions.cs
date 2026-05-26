@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -70,6 +71,9 @@ public static class ProgramExtensions
                     })
                     .AddJwtBearer(options =>
                     {
+                        var rsa = RSA.Create();
+                        rsa.ImportFromPem(jwtConfig["PublicKey"]);
+                        
                         options.TokenValidationParameters = new TokenValidationParameters
                         {
                             ValidateIssuer = true,
@@ -77,7 +81,7 @@ public static class ProgramExtensions
                             ValidateAudience = true,
                             ValidAudience = jwtConfig["Audience"],
                             ValidateLifetime = true,
-                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig["Secret"]!)),
+                            IssuerSigningKey = new RsaSecurityKey(rsa),
                             ValidateIssuerSigningKey = true
                         };
 

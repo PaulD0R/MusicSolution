@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -24,14 +25,15 @@ public class JwtService(
         };
         claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
+        var rsa = RSA.Create();
+        rsa.ImportFromPem(options.Value.PrivateKey);
+        
         var jwt = new JwtSecurityToken(
             issuer: options.Value.Issuer,
             audience: options.Value.Audience,
             claims: claims,
-            expires: DateTime.Now.AddMinutes(10),
-            signingCredentials: new SigningCredentials
-                (new SymmetricSecurityKey(Encoding.UTF8.GetBytes(options.Value.Secret!)),
-                    SecurityAlgorithms.HmacSha256)
+            expires: DateTime.UtcNow.AddMinutes(10),
+            signingCredentials: new SigningCredentials(new RsaSecurityKey(rsa), SecurityAlgorithms.RsaSha256)
         );
         
         return new JwtSecurityTokenHandler().WriteToken(jwt);
