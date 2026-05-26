@@ -1,18 +1,18 @@
 ﻿services:
-  userservice.api:
-    image: userservice.api
+  roomservice.api:
+    image: roomservice.api
     build:
       context: .
-      dockerfile: UserService.API/Dockerfile
+      dockerfile: RoomService.API/Dockerfile
     environment:
-      - ConnectionStrings__Postgres=Host=user-postgres;Port=5432;Database=music_user;Username=pauldor;Password=asdfgh67;
-      
+      - ConnectionStrings__Postgres=Host=room-postgres;Port=5432;Database=music_room;Username=pauldor;Password=asdfgh67;
+    
       - ConnectionStrings__Redis=redis:6379,abortConnect=false
-          
-      - ConnectioStrings_YARP=yarp-music:8080
-        
+
+      - ConnectioStrings_YARP__Path=yarp-music:8080
+
       - Logs__Path=/app/Logs/log-.txt
-      
+
       - Kafka__PersonCreated__BootstrapServers=kafka-server:9092
       - Kafka__PersonCreated__Topic=person-created
 
@@ -21,7 +21,7 @@
 
       - Kafka__PersonUpdated__BootstrapServers=kafka-server:9092
       - Kafka__PersonUpdated__Topic=person-updated
-        
+
       - Jwt__Issuer=Issuer
       - Jwt__Audience=Audience
       - Jwt__Secret=8Yd1CYLqzRzPF7Ntzdrp72KGb2aBG/4kGxYZE6ImuOo=
@@ -32,17 +32,17 @@
     depends_on:
       postgres:
         condition: service_healthy
-          
+
 
   postgres:
     image: postgres:16.11
-    container_name: user-postgres
+    container_name: room-postgres
     environment:
-      POSTGRES_DB: "music_user"
-      POSTGRES_USER: "pauldor"    
-      POSTGRES_PASSWORD: "asdfgh67"
+        POSTGRES_DB: "music_room"
+        POSTGRES_USER: "pauldor"
+        POSTGRES_PASSWORD: "asdfgh67"
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U pauldor -d music_user" ]
+      test: [ "CMD-SHELL", "pg_isready -U pauldor -d music_room" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -51,11 +51,11 @@
       - ./Databases/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - music-solution-network
-      
+
 volumes:
   postgres_data:
   logs_data:
-    
+
 networks:
   music-solution-network:
     external: true

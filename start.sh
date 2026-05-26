@@ -7,6 +7,7 @@ KAFKA_FILE="Kafka/compose.yaml"
 MUSIC_SERVICE_FILE="MusicService/compose.yaml"
 USER_SERVICE_FILE="UserService/compose.yaml"
 COMMENT_SERVICE_FILE="CommentService/compose.yaml"
+ROOM_SERVICE_FILE="RoomService/compose.yaml"
 YARP_FILE="YARP/compose.yaml"
 
 KAFKA_CONTAINER_NAME="kafka-server"
@@ -25,6 +26,7 @@ docker compose -f $KAFKA_FILE up -d
 docker compose -f $MUSIC_SERVICE_FILE up -d
 docker compose -f $USER_SERVICE_FILE up -d
 docker compose -f $COMMENT_SERVICE_FILE up -d
+docker compose -f $ROOM_SERVICE_FILE up -d
 docker compose -f $YARP_FILE up -d
 
 docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"

@@ -9,4 +9,4 @@ public class KafkaJsonSerializer<TMessage> : ISerializer<TMessage>
     {
         return JsonSerializer.SerializeToUtf8Bytes(data);
     }
-}
+}   

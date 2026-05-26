@@ -21,6 +21,7 @@ headerOptions.KnownNetworks.Clear();
 headerOptions.KnownProxies.Clear();
 
 app.UseForwardedHeaders(headerOptions);
+app.UseWebSockets();
 app.Use(async (context, next) =>
 {
     var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
