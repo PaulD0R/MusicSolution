@@ -1,13 +1,17 @@
 using MusicService.API.Extensions;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
+    .AddLoggers(builder.Configuration.GetSection("Logs"))
     .AddAppInfrastructure(builder.Configuration)
     .AddAppTelemetry()
     .AddSecurityConfiguration(builder.Configuration.GetSection("Jwt"))
     .AddBusinessServices(builder.Configuration)
     .AddWebPresentation(builder.Configuration);
+
+builder.Host.UseSerilog();
 
 var app = builder.Build();
 

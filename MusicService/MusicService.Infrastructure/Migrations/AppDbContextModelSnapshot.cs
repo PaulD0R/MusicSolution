@@ -43,7 +43,7 @@ namespace MusicService.Infrastructure.Migrations
 
             modelBuilder.Entity("MusicService.Domain.Models.MusicData", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("MusicId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
@@ -58,7 +58,7 @@ namespace MusicService.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.HasKey("MusicId");
 
                     b.HasIndex("Name");
 

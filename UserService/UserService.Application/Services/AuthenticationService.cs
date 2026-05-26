@@ -17,7 +17,7 @@ public class AuthenticationService(
     IPersonRepository personRepository,
     IJwtService jwtService,
     IRefreshTokenRepository refreshTokenRepository,
-    //IMessageProducer<PersonCreateEvent> messageProducer,
+    IMessageProducer<PersonCreateEvent> messageProducer,
     UserManager<Person> userManager,
     SignInManager<Person> signInManager,
     IHttpContextAccessor  httpContextAccessor,
@@ -36,7 +36,7 @@ public class AuthenticationService(
         var refreshToken = await refreshTokenRepository.CreateNewRefreshTokenAsync(person);
 
         var httpContext = httpContextAccessor.HttpContext;
-        httpContext.Response.Cookies.Append("jwt", token);
+        httpContext?.Response.Cookies.Append("jwt", token);
         
         return new TokensDto
         {
@@ -62,8 +62,8 @@ public class AuthenticationService(
         var refreshToken = await refreshTokenRepository.CreateNewRefreshTokenAsync(person);
         logger.LogInformation($"Tokens was created successfully");
 
-        //await messageProducer.ProduceAsync(person.ToPersonCreateEvent());
-        //logger.LogInformation($"Kafka is working successfully");
+        await messageProducer.ProduceAsync(person.ToPersonCreateEvent());
+        logger.LogInformation($"Kafka is working successfully");
 
         var httpContext = httpContextAccessor.HttpContext;
         httpContext?.Response.Cookies.Append("jwt", token);
